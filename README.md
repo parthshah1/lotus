@@ -25,7 +25,7 @@ For complete instructions on how to build, install and setup lotus, please visit
 
 ## Reporting a Vulnerability
 
-Please send an email to security@filecoin.org. See our [security policy](SECURITY.md) for more details.
+See our [security policy](SECURITY.md) for more details.
 
 ## Related packages
 
