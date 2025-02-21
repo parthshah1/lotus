@@ -1268,7 +1268,7 @@ Parameters:
 Returns:
   - *types.IndexValidation: A pointer to an IndexValidation struct containing the results of the validation/backfill.
   - error: An error object if the validation/backfill fails. The error message will contain details about the index
-           corruption if the call fails because of an incosistency between indexed data and the actual chain state.
+           corruption if the call fails because of an inconsistency between indexed data and the actual chain state.
            Note: The API returns an error if the index does not have data for the specified epoch and backfill is set to false.
 
 
@@ -2624,7 +2624,9 @@ Response:
   "Gpbft": {
     "Delta": 0,
     "DeltaBackOffExponent": 0,
+    "QualityDeltaMultiplier": 0,
     "MaxLookaheadRounds": 0,
+    "ChainProposedLength": 0,
     "RebroadcastBackoffBase": 0,
     "RebroadcastBackoffExponent": 0,
     "RebroadcastBackoffSpread": 0,
@@ -2643,6 +2645,18 @@ Response:
     "ServerRequestTimeout": 0,
     "MinimumPollInterval": 0,
     "MaximumPollInterval": 0
+  },
+  "PubSub": {
+    "CompressionEnabled": false
+  },
+  "ChainExchange": {
+    "SubscriptionBufferSize": 0,
+    "MaxChainLength": 0,
+    "MaxInstanceLookahead": 0,
+    "MaxDiscoveredChainsPerInstance": 0,
+    "MaxWantedChainsPerInstance": 0,
+    "RebroadcastInterval": 0,
+    "MaxTimestampAge": 0
   }
 }
 ```
@@ -6787,9 +6801,6 @@ Response:
   "NetworkName": "lotus",
   "BlockDelaySecs": 42,
   "ConsensusMinerMinPower": "0",
-  "SupportedProofTypes": [
-    8
-  ],
   "PreCommitChallengeDelay": 10101,
   "ForkUpgradeParams": {
     "UpgradeSmokeHeight": 10101,

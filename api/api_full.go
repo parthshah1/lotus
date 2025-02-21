@@ -90,7 +90,7 @@ type FullNode interface {
 	// Returns:
 	//   - *types.IndexValidation: A pointer to an IndexValidation struct containing the results of the validation/backfill.
 	//   - error: An error object if the validation/backfill fails. The error message will contain details about the index
-	//            corruption if the call fails because of an incosistency between indexed data and the actual chain state.
+	//            corruption if the call fails because of an inconsistency between indexed data and the actual chain state.
 	//            Note: The API returns an error if the index does not have data for the specified epoch and backfill is set to false.
 	ChainValidateIndex(ctx context.Context, epoch abi.ChainEpoch, backfill bool) (*types.IndexValidation, error) //perm:write
 
@@ -1164,7 +1164,7 @@ type ChannelAvailableFunds struct {
 	// QueuedAmt is the amount that is queued up behind a pending request
 	QueuedAmt types.BigInt
 
-	// VoucherRedeemedAmt is the amount that is redeemed by vouchers on-chain
+	// VoucherReedeemedAmt is the amount that is redeemed by vouchers on-chain
 	// and in the local datastore
 	VoucherReedeemedAmt types.BigInt
 }
