@@ -71,8 +71,9 @@ func NewManifest(
 			MinimumPollInterval:  ecPeriod,
 			MaximumPollInterval:  4 * ecPeriod,
 		},
-		PubSub:        manifest.DefaultPubSubConfig,
-		ChainExchange: manifest.DefaultChainExchangeConfig,
+		PubSub:                manifest.DefaultPubSubConfig,
+		ChainExchange:         manifest.DefaultChainExchangeConfig,
+		PartialMessageManager: manifest.DefaultPartialMessageManagerConfig,
 	}
 }
 
@@ -109,6 +110,9 @@ func NewConfig(nn dtypes.NetworkName) *Config {
 			time.Duration(buildconstants.BlockDelaySecs)*time.Second,
 			buildconstants.F3InitialPowerTableCID,
 		)
+	}
+	if buildconstants.F3ParamsAddress != "" {
+		c.ContractAddress = buildconstants.F3ParamsAddress
 	}
 	return c
 }

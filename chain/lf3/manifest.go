@@ -25,6 +25,7 @@ import (
 
 	"github.com/filecoin-project/lotus/api"
 	"github.com/filecoin-project/lotus/build"
+	"github.com/filecoin-project/lotus/build/buildconstants"
 	"github.com/filecoin-project/lotus/chain/store"
 	"github.com/filecoin-project/lotus/chain/types"
 	"github.com/filecoin-project/lotus/chain/types/ethtypes"
@@ -51,13 +52,29 @@ var MaxDynamicManifestChangesAllowed = 1000
 
 func NewManifestProvider(mctx helpers.MetricsCtx, config *Config, cs *store.ChainStore, ps *pubsub.PubSub, mds dtypes.MetadataDS, stateCaller StateCaller) (prov manifest.ManifestProvider, err error) {
 	var primaryManifest manifest.ManifestProvider
-	if config.StaticManifest != nil {
-		log.Infof("using static maniest as primary")
+
+	// Check if static manifest activation is disabled
+	staticDisabled := false
+	if config.StaticManifest != nil && build.IsF3EpochActivationDisabled(config.StaticManifest.BootstrapEpoch) {
+		log.Warnf("F3 activation disabled by environment configuration for bootstrap epoch %d", config.StaticManifest.BootstrapEpoch)
+		staticDisabled = true
+	}
+
+	// Check if contract manifest activation is disabled
+	contractDisabled := false
+	if config.ContractAddress != "" && build.IsF3ContractActivationDisabled(config.ContractAddress) {
+		log.Warnf("F3 activation disabled by environment configuration for contract %s", config.ContractAddress)
+		contractDisabled = true
+	}
+
+	if config.StaticManifest != nil && !staticDisabled {
+		log.Infof("using static manifest as primary")
 		primaryManifest, err = manifest.NewStaticManifestProvider(config.StaticManifest)
-	} else if config.ContractAddress != "" {
-		log.Infow("using contract maniest as primary", "address", config.ContractAddress)
+	} else if config.ContractAddress != "" && !contractDisabled {
+		log.Infow("using contract manifest as primary", "address", config.ContractAddress)
 		primaryManifest, err = NewContractManifestProvider(mctx, config, stateCaller)
 	}
+
 	if err != nil {
 		return nil, fmt.Errorf("creating primary manifest: %w", err)
 	}
@@ -237,6 +254,10 @@ func (cmp *ContractManifestProvider) fetchManifest(ctx context.Context) (*manife
 
 	if m.BootstrapEpoch < 0 || uint64(m.BootstrapEpoch) != activationEpoch {
 		return nil, fmt.Errorf("bootstrap epoch does not match: %d != %d", m.BootstrapEpoch, activationEpoch)
+	}
+
+	if !m.InitialPowerTable.Defined() && buildconstants.F3InitialPowerTableCID.Defined() {
+		m.InitialPowerTable = buildconstants.F3InitialPowerTableCID
 	}
 
 	if err := m.Validate(); err != nil {

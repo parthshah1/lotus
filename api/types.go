@@ -160,6 +160,7 @@ type NetworkParams struct {
 	PreCommitChallengeDelay abi.ChainEpoch
 	ForkUpgradeParams       ForkUpgradeParams
 	Eip155ChainID           int
+	GenesisTimestamp        uint64
 }
 
 type ForkUpgradeParams struct {
@@ -193,6 +194,7 @@ type ForkUpgradeParams struct {
 	UpgradeWaffleHeight      abi.ChainEpoch
 	UpgradeTuktukHeight      abi.ChainEpoch
 	UpgradeTeepHeight        abi.ChainEpoch
+	UpgradeTockHeight        abi.ChainEpoch
 }
 
 // ChainExportConfig holds configuration for chain ranged exports.

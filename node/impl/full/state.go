@@ -240,10 +240,15 @@ func (a *StateAPI) StateMinerDeadlines(ctx context.Context, m address.Address, t
 		if err != nil {
 			return err
 		}
+		dailyFee, err := dl.DailyFee()
+		if err != nil {
+			return err
+		}
 
 		out[i] = api.Deadline{
 			PostSubmissions:      ps,
 			DisputableProofCount: l,
+			DailyFee:             dailyFee,
 		}
 		return nil
 	}); err != nil {
@@ -2043,12 +2048,20 @@ func (a *StateAPI) StateGetNetworkParams(ctx context.Context) (*api.NetworkParam
 		return nil, err
 	}
 
+	var genesisTimestamp uint64
+	if genBlock, err := a.Chain.GetGenesis(ctx); err != nil {
+		return nil, xerrors.Errorf("getting genesis: %w", err)
+	} else if genBlock != nil {
+		genesisTimestamp = genBlock.Timestamp
+	}
+
 	return &api.NetworkParams{
 		NetworkName:             networkName,
 		BlockDelaySecs:          buildconstants.BlockDelaySecs,
 		ConsensusMinerMinPower:  buildconstants.ConsensusMinerMinPower,
 		PreCommitChallengeDelay: buildconstants.PreCommitChallengeDelay,
 		Eip155ChainID:           buildconstants.Eip155ChainId,
+		GenesisTimestamp:        genesisTimestamp,
 		ForkUpgradeParams: api.ForkUpgradeParams{
 			UpgradeSmokeHeight:       buildconstants.UpgradeSmokeHeight,
 			UpgradeBreezeHeight:      buildconstants.UpgradeBreezeHeight,
@@ -2080,6 +2093,7 @@ func (a *StateAPI) StateGetNetworkParams(ctx context.Context) (*api.NetworkParam
 			UpgradeWaffleHeight:      buildconstants.UpgradeWaffleHeight,
 			UpgradeTuktukHeight:      buildconstants.UpgradeTuktukHeight,
 			UpgradeTeepHeight:        buildconstants.UpgradeTeepHeight,
+			UpgradeTockHeight:        buildconstants.UpgradeTockHeight,
 		},
 	}, nil
 }

@@ -360,7 +360,8 @@ Response:
 {
   "Version": "string value",
   "APIVersion": 131840,
-  "BlockDelay": 42
+  "BlockDelay": 42,
+  "Agent": "string value"
 }
 ```
 
@@ -2647,7 +2648,10 @@ Response:
     "MaximumPollInterval": 0
   },
   "PubSub": {
-    "CompressionEnabled": false
+    "CompressionEnabled": false,
+    "ChainCompressionEnabled": false,
+    "GMessageSubscriptionBufferSize": 0,
+    "ValidatedMessageBufferSize": 0
   },
   "ChainExchange": {
     "SubscriptionBufferSize": 0,
@@ -2657,6 +2661,15 @@ Response:
     "MaxWantedChainsPerInstance": 0,
     "RebroadcastInterval": 0,
     "MaxTimestampAge": 0
+  },
+  "PartialMessageManager": {
+    "PendingDiscoveredChainsBufferSize": 0,
+    "PendingPartialMessagesBufferSize": 0,
+    "PendingChainBroadcastsBufferSize": 0,
+    "PendingInstanceRemovalBufferSize": 0,
+    "CompletedMessagesBufferSize": 0,
+    "MaxBufferedMessagesPerInstance": 0,
+    "MaxCachedValidatedMessagesPerInstance": 0
   }
 }
 ```
@@ -2707,9 +2720,26 @@ Inputs: `null`
 Response:
 ```json
 {
-  "ID": 42,
-  "Round": 42,
-  "Phase": 0
+  "ID": 1413,
+  "Round": 1,
+  "Phase": 4,
+  "Input": [
+    {
+      "Key": [
+        {
+          "/": "bafy2bzacea3wsdh6y3a36tb3skempjoxqpuyompjbmfeyf34fi3uy6uue42v4"
+        },
+        {
+          "/": "bafy2bzacebp3shtrn43k7g3unredz7fxn4gj533d3o43tqn2p2ipxxhrvchve"
+        }
+      ],
+      "Commitments": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+      "Epoch": 0,
+      "PowerTable": {
+        "/": "bafy2bzacea3wsdh6y3a36tb3skempjoxqpuyompjbmfeyf34fi3uy6uue42v4"
+      }
+    }
+  ]
 }
 ```
 
@@ -6430,6 +6460,8 @@ Response:
 ### StateDealProviderCollateralBounds
 StateDealProviderCollateralBounds returns the min and max collateral a storage provider
 can issue. It takes the deal size and verified status as parameters.
+Note: The min value returned is overestimated by 10% (multiplied by 110/100).
+See: node/impl/full/state.go StateDealProviderCollateralBounds implementation.
 
 
 Perms: read
@@ -6832,9 +6864,11 @@ Response:
     "UpgradePhoenixHeight": 10101,
     "UpgradeWaffleHeight": 10101,
     "UpgradeTuktukHeight": 10101,
-    "UpgradeTeepHeight": 10101
+    "UpgradeTeepHeight": 10101,
+    "UpgradeTockHeight": 10101
   },
-  "Eip155ChainID": 123
+  "Eip155ChainID": 123,
+  "GenesisTimestamp": 42
 }
 ```
 
@@ -7279,9 +7313,6 @@ Response:
     "SealedCID": {
       "/": "bafy2bzacea3wsdh6y3a36tb3skempjoxqpuyompjbmfeyf34fi3uy6uue42v4"
     },
-    "DealIDs": [
-      5432
-    ],
     "Activation": 10101,
     "Expiration": 10101,
     "DealWeight": "0",
@@ -7294,7 +7325,8 @@ Response:
     "SectorKeyCID": {
       "/": "bafy2bzacea3wsdh6y3a36tb3skempjoxqpuyompjbmfeyf34fi3uy6uue42v4"
     },
-    "Flags": 0
+    "Flags": 0,
+    "DailyFee": "0"
   }
 ]
 ```
@@ -7379,7 +7411,8 @@ Response:
       5,
       1
     ],
-    "DisputableProofCount": 42
+    "DisputableProofCount": 42,
+    "DailyFee": "0"
   }
 ]
 ```
@@ -7476,6 +7509,8 @@ deal space in the sector in order to perform a QAP calculation. Since network ve
 the introduction of DDO, the DealIDs field can no longer be used to reliably determine verified
 deal space; therefore, this method is deprecated. Use StateMinerInitialPledgeForSector instead
 and pass in the verified deal space directly.
+Note: The value returned is overestimated by 10% (multiplied by 110/100).
+See: node/impl/full/state.go StateMinerInitialPledgeCollateral implementation.
 
 Deprecated: Use StateMinerInitialPledgeForSector instead.
 
@@ -7519,6 +7554,8 @@ StateMinerInitialPledgeForSector returns the initial pledge collateral for a giv
 duration, size, and combined size of any verified pieces within the sector. This calculation
 depends on current network conditions (total power, total pledge and current rewards) at the
 given tipset.
+Note: The value returned is overestimated by 10% (multiplied by 110/100).
+See: node/impl/full/state.go StateMinerInitialPledgeForSector implementation.
 
 
 Perms: read
@@ -7630,6 +7667,8 @@ Response:
 
 ### StateMinerPreCommitDepositForPower
 StateMinerPreCommitDepositForPower returns the precommit deposit for the specified miner's sector
+Note: The value returned is overestimated by 10% (multiplied by 110/100).
+See: node/impl/full/state.go StateMinerPreCommitDepositForPower implementation.
 
 
 Perms: read
@@ -7822,9 +7861,6 @@ Response:
     "SealedCID": {
       "/": "bafy2bzacea3wsdh6y3a36tb3skempjoxqpuyompjbmfeyf34fi3uy6uue42v4"
     },
-    "DealIDs": [
-      5432
-    ],
     "Activation": 10101,
     "Expiration": 10101,
     "DealWeight": "0",
@@ -7837,7 +7873,8 @@ Response:
     "SectorKeyCID": {
       "/": "bafy2bzacea3wsdh6y3a36tb3skempjoxqpuyompjbmfeyf34fi3uy6uue42v4"
     },
-    "Flags": 0
+    "Flags": 0,
+    "DailyFee": "0"
   }
 ]
 ```
@@ -8203,9 +8240,6 @@ Response:
   "SealedCID": {
     "/": "bafy2bzacea3wsdh6y3a36tb3skempjoxqpuyompjbmfeyf34fi3uy6uue42v4"
   },
-  "DealIDs": [
-    5432
-  ],
   "Activation": 10101,
   "Expiration": 10101,
   "DealWeight": "0",
@@ -8218,7 +8252,8 @@ Response:
   "SectorKeyCID": {
     "/": "bafy2bzacea3wsdh6y3a36tb3skempjoxqpuyompjbmfeyf34fi3uy6uue42v4"
   },
-  "Flags": 0
+  "Flags": 0,
+  "DailyFee": "0"
 }
 ```
 
