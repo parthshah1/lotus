@@ -110,6 +110,12 @@ func NewTipSet(blks []*BlockHeader) (*TipSet, error) {
 		return nil, xerrors.Errorf("NewTipSet called with zero length array of blocks")
 	}
 
+	for _, b := range blks {
+		if b.Ticket == nil {
+			return nil, fmt.Errorf("block %s has nil Ticket", b.Cid())
+		}
+	}
+
 	sort.Slice(blks, tipsetSortFunc(blks))
 
 	var ts TipSet
